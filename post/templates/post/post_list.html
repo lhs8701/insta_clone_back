@@ -5,7 +5,35 @@
 {% endblock %}
 
 {% block content %}
+    <!-- hidden -->
+    {% if user.profile.get_following %}
+        <div class="hidden_menu">
+            <div class="scroll_inner">
+                {% for following in user.profile.get_following %}
+                    <div class="user">
+                        <div class="thumb_img">
+                            {% if following.picture %}
+                                <img src="{{ following.picture.url }}" alt="{{ following.nickname }}의 프로필 이미지">
+                            {% else %}
+                                <img src="{% static 'imgs/thumb.jpeg' %}" alt="{{ following.nickname }}의 프로필 이미지">
+                            {% endif %}
+                        </div>
+                        <div class="id">{{ following.nickname }}</div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% else %}
+        <div class="hidden_menu">
+            <div class="scroll_inner">
+                <div class="notic">
+                    팔로우한 유저가 없습니다 팔로우를 해주세요
+                </div>
+            </div>
+        </div>
+    {% endif %}
 
+    <!-- main -->
     <section id="main_container">
         <div class="inner">
 
@@ -27,18 +55,28 @@
                                 </div>
 
                             </div>
-                            <div>
-                                <form action="{% url 'post:post_delete' post.pk %}" method="post">
-                                    {% csrf_token %}
-                                    <input type="submit" value="삭제">
-                                </form>
-                            </div>
 
                             <div class="sprite_more_icon" data-name="more">
                                 <ul class="toggle_box">
-                                    <li><input type="submit" class="follow" value="팔로우" data-name="follow"></li>
-                                    <li>수정</li>
-                                    <li>삭제</li>
+                                    <li>
+                                        {% if user.profile in post.author.profile.get_follower %}
+                                            <input type="submit" class="follow" value="팔로잉" data-name="follow"
+                                                   name="{{ post.author.profile.id }}">
+                                        {% else %}
+                                            <input type="submit" class="follow" value="팔로우" data-name="follow"
+                                                   name="{{ post.author.profile.id }}">
+                                        {% endif %}
+                                    </li>
+                                    {% if post.author == user %}
+                                        <li><a class="post-edit" href="{% url 'post:post_edit' post.pk %}">수정</a></li>
+                                        <li>
+                                            <form class="post-delete-form"
+                                                  action="{% url 'post:post_delete' post.pk %}">
+                                                {% csrf_token %}
+                                                <input type="submit" class="post-delete" value="삭제">
+                                            </form>
+                                        </li>
+                                    {% endif %}
                                 </ul>
                             </div>
                         </header>
@@ -53,9 +91,11 @@
                             <div class="left_icons">
                                 <div class="heart_btn">
                                     {% if user in post.like_user_set.all %}
-                                        <div class="sprite_heart_icon_outline on" name="{{ post.id }}" data-name="heartbeat"></div>
+                                        <div class="sprite_heart_icon_outline on" name="{{ post.id }}"
+                                             data-name="heartbeat"></div>
                                     {% else %}
-                                        <div class="sprite_heart_icon_outline" name="{{ post.id }}" data-name="heartbeat"></div>
+                                        <div class="sprite_heart_icon_outline" name="{{ post.id }}"
+                                             data-name="heartbeat"></div>
                                     {% endif %}
                                 </div>
                                 <div class="sprite_bubble_icon"></div>
@@ -63,9 +103,11 @@
                             </div>
                             <div class="right_icon">
                                 {% if user in post.bookmark_user_set.all %}
-                                    <div class="sprite_bookmark_outline on" name="{{ post.id }}" data-name="bookmark"></div>
+                                    <div class="sprite_bookmark_outline on" name="{{ post.id }}"
+                                         data-name="bookmark"></div>
                                 {% else %}
-                                    <div class="sprite_bookmark_outline" name="{{ post.id }}" data-name="bookmark"></div>
+                                    <div class="sprite_bookmark_outline" name="{{ post.id }}"
+                                         data-name="bookmark"></div>
                                 {% endif %}
                             </div>
                         </div>
@@ -78,13 +120,14 @@
                         <div class="comment_container">
                             <div class="comment" id="comment-list-ajax-post{{ post.id }}">
                                 {% for comment in post.comment_set.all %}
-                                <div class="comment-detail" id="comment{{ comment.id }}">
-                                    <div class="nick_name m_text">{{ comment.author.profile.nickname }}</div>
-                                    <div>{{ comment.content }}</div>
-                                    {% if user == comment.author %}
-                                        <input type="button" class="del_comment" data-name="comment_delete" value="삭제" name="{{ comment.id }}">
-                                    {% endif %}
-                                </div>
+                                    <div class="comment-detail" id="comment{{ comment.id }}">
+                                        <div class="nick_name m_text">{{ comment.author.profile.nickname }}</div>
+                                        <div>{{ comment.content }}</div>
+                                        {% if user == comment.author %}
+                                            <input type="button" class="del_comment" data-name="comment_delete"
+                                                   value="삭제" name="{{ comment.id }}">
+                                        {% endif %}
+                                    </div>
                                 {% endfor %}
                             </div>
                             <div class="small_heart">
@@ -100,7 +143,9 @@
                                 <div class="upload_btn m_text" name="{{ post.id }}" data-name="comment">게시</div>
                             {% else %}
                                 {{ comment_form }}
-                                <div class="upload_btn m_text" name="{{ post.id }}" data-name="comment" onclick="alert('댓글을 작성하려면 로그인이 필요합니다')">게시</div>
+                                <div class="upload_btn m_text" name="{{ post.id }}" data-name="comment"
+                                     onclick="alert('댓글을 작성하려면 로그인이 필요합니다')">게시
+                                </div>
                             {% endif %}
                         </div>
                     </article>
@@ -133,16 +178,19 @@
                     </header>
 
                     <div class="scroll_inner">
-                        <div class="thumb_user">
-                            <div class="profile_thumb">
-                                <img src="imgs/thumb02.jpg" alt="프로필사진">
-                            </div>
-                            <div class="detail">
-                                <div class="id">kind_tigerrrr</div>
-                                <div class="time">1시간 전</div>
-                            </div>
-                        </div>
-
+                        {% if following_post_list %}
+                            {% for post in following_post_list %}
+                                <div class="thumb_user">
+                                    <div class="profile_thumb">
+                                        <img src="{{ post.photo.url }}" alt="프로필사진">
+                                    </div>
+                                    <div class="detail">
+                                        <div class="id">{{ post.content }}</div>
+                                        <div class="time">{{ post.updated_at|timesince }}</div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
                     </div>
                 </article>
 
@@ -152,28 +200,20 @@
                         <div class="more">모두 보기</div>
                     </header>
 
+                    {% for post in posts|slice:"1:2" %}
                     <div class="thumb_user">
                         <div class="profile_thumb">
-                            <img src="imgs/thumb02.jpg" alt="프로필사진">
+                            <img src="{{ post.photo.url }}" alt="프로필사진">
                         </div>
                         <div class="detail">
-                            <div class="id">kind_tigerrrr</div>
-                            <div class="time">1시간 전</div>
+                            <div class="id">{{ post.content }}</div>
+                            <div class="time">{{ post.updated_at|timesince }}</div>
                         </div>
                     </div>
-                    <div class="thumb_user">
-                        <div class="profile_thumb">
-                            <img src="imgs/thumb02.jpg" alt="프로필사진">
-                        </div>
-                        <div class="detail">
-                            <div class="id">kind_tigerrrr</div>
-                            <div class="time">1시간 전</div>
-                        </div>
-                    </div>
+                    {% endfor %}
+
                 </article>
             </div>
-
-
         </div>
     </section>
 {% include "post/script_ajax.html" %}

@@ -1,7 +1,9 @@
-from django.db import models
-from imagekit.processors import ResizeToFill
-from imagekit.models import ProcessedImageField
 from django.conf import settings
+from django.db import models
+from imagekit.models import ProcessedImageField
+from imagekit.processors import ResizeToFill
+
+from accounts.models import Profile
 
 
 def photo_path(instance, filename):
@@ -87,3 +89,4 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.content
+

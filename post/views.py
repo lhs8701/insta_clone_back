@@ -14,14 +14,20 @@ from .models import Post, Like, Bookmark, Comment
 def post_list(request, tag=None):
     posts = Post.objects.all()
     comment_form = CommentForm()
+
     if request.user.is_authenticated:
         username = request.user
         user = get_object_or_404(get_user_model(), username=username)
         user_profile = user.profile
+
+        following_set = request.user.profile.get_following
+        following_post_list = Post.objects.filter(author__profile__in=following_set)
+
         context = {
             'user_profile': user_profile,
             'posts': posts,
             'comment_form': comment_form,
+            'following_post_list' : following_post_list,
         }
         return render(request, 'post/post_list.html', context)
     else:
