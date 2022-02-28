@@ -18,7 +18,7 @@ class SignupForm(UserCreationForm):
 
     def clean_nickname(self):
         nickname = self.cleaned_data.get('nickname')
-        if Profile.objects.filter(nickname=nickname).exist():
+        if Profile.objects.filter(nickname=nickname).exists():
             raise forms.ValidationError('이미 존재하는 닉네임 입니다')
         return nickname
 

@@ -7,6 +7,7 @@ from django.shortcuts import redirect
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
+
     path('post/',include('post.urls', namespace='post')),
     path('',lambda r: redirect('post:post_list'), name='root')
 ]
