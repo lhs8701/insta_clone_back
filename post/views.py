@@ -67,6 +67,21 @@ def post_list(request, tag=None):
             'comment_form': comment_form,
         })
 
+def my_post_list(request, username):
+    user = get_object_or_404(get_user_model(), username=username)
+    user_profile = user.profile
+    target_user = get_user_model().objects.filter(id=user.id)
+
+    post_list = user.post_set.all()
+    all_post_list = Post.objects.all()
+
+    return render(request, 'post/my_post_list.html',{
+        'user_profile':user_profile,
+        'target_user':target_user,
+        'post_list':post_list,
+        'all_post_list':all_post_list,
+        'username':username,
+    })
 
 @login_required
 def post_new(request):
@@ -118,6 +133,16 @@ def post_delete(request, pk):
         post.delete()
         # messages.success(request,'삭제완료')
     return redirect('post:post_list')
+
+
+def post_detail(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    comment_form = CommentForm()
+
+    return render(request, 'post/post_detail.html', {
+        'comment_form': comment_form,
+        'post': post,
+    })
 
 
 @login_required
