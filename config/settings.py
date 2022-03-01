@@ -14,14 +14,15 @@ from pathlib import Path
 import os, json
 from django.core.exceptions import ImproperlyConfigured
 
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 secret_file = os.path.join(BASE_DIR, 'secrets.json')
 
 with open(secret_file) as f:
-    secrets= json.loads(f.read())
+    secrets = json.loads(f.read())
+
+
 def get_secret(setting, secrets=secrets):
     """비밀변수를 가져오거나 명시적 예외를 반환한다."""
     try:
@@ -88,8 +89,12 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'rdstest',
+        'USER': 'rdstest',
+        'PASSWORD': 'lhs21201',
+        'HOST': 'rdstest.ciavuydxbsp5.ap-northeast-2.rds.amazonaws.com',
+        'PORT': '3306',
     }
 }
 
@@ -127,7 +132,21 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
-STATIC_URL = '/static/'
+AWS_ACCESS_KEY_ID = 'AKIAZPJZSMT4P2EQ3KXZ'
+AWS_SECRET_ACCESS_KEY = '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'
+AWS_REGION = 'ap-northeast-2c'
+AWS_STORAGE_BUCKET_NAME = 's3djangotest2'
+AWS_S3_CUSTOM_DOMAIN = '%s.s3.%s.amazonaws.com' % (AWS_STORAGE_BUCKET_NAME, AWS_REGION)
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+# AWS_DEFAULT_ACL = 'public-read'
+AWS_DEFAULT_ACL = None
+AWS_LOCATION = 'static'
+STATIC_URL = 'https://%s/%s/' % (AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION)
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+DEFAULT_FILE_STORAGE = 'config.asst_storage.MediaStorage'
+
 STATICFILES_DIRS = [
     BASE_DIR / 'config' / 'static',
 ]

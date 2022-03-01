@@ -31,7 +31,7 @@ def login_check(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return redirect
+            return redirect("/")
     else:
         form = AuthenticationForm()
 
